@@ -468,35 +468,35 @@ jobs:
       - revert-migrations
       - destroy-environment
 
-cleanup:
-    docker:
-      # Docker image here
-      - image: amazon/aws-cli
-    steps:
-      # Checkout code from git
-      - checkout
-      - run:
-          name: Get old stack workflow id
-          command: |
-            # your code here
-            export OldWorkflowID=$(curl --insecure https://kvdb.io/${KVDB_BUCKET_ID}/old_workflow_id)
-            export STACKS=($(aws --region us-west-2 cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
-            echo OldWorkflowID: "${OldWorkflowID}"
-            echo CIRCLE_WORKFLOW_ID "$CIRCLE_WORKFLOW_ID"
-            echo Stack names: "${STACKS[@]}"
-      - run:
-          name: Remove old stacks and files
-          command: |
-            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-            then
+  cleanup:
+      docker:
+        # Docker image here
+        - image: amazon/aws-cli
+      steps:
+        # Checkout code from git
+        - checkout
+        - run:
+            name: Get old stack workflow id
+            command: |
               # your code here
-              aws --region us-west-2 s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-              aws --region us-west-2 cloudformation delete-stack --stack-name "project3-udapeople-backend-${OldWorkflowID}"
-              aws --region us-west-2 cloudformation delete-stack --stack-name "project3-udapeople-frontend-${OldWorkflowID}"
-              echo "=======================Is this deleted========================"
-            else
-              echo "=======================Do not delete========================"
-            fi
+              export OldWorkflowID=$(curl --insecure https://kvdb.io/${KVDB_BUCKET_ID}/old_workflow_id)
+              export STACKS=($(aws --region us-west-2 cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+              echo OldWorkflowID: "${OldWorkflowID}"
+              echo CIRCLE_WORKFLOW_ID "$CIRCLE_WORKFLOW_ID"
+              echo Stack names: "${STACKS[@]}"
+        - run:
+            name: Remove old stacks and files
+            command: |
+              if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+              then
+                # your code here
+                aws --region us-west-2 s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+                aws --region us-west-2 cloudformation delete-stack --stack-name "project3-udapeople-backend-${OldWorkflowID}"
+                aws --region us-west-2 cloudformation delete-stack --stack-name "project3-udapeople-frontend-${OldWorkflowID}"
+                echo "=======================Is this deleted========================"
+              else
+                echo "=======================Do not delete========================"
+              fi
             
 
 workflows:
