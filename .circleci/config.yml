@@ -157,6 +157,7 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
       - slack/notify:
+          channel: $SLACK_DEFAULT_CHANNEL # add extra channel
           event: fail
           template: basic_fail_1
 
