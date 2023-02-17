@@ -165,6 +165,15 @@ jobs:
       - image: amazon/aws-cli
     steps:
       # Checkout code from git
+      - run: 
+           name: set/override default region 
+           command: | 
+               aws configure set default.region "us-east-2
+               echo $(aws configure list)
+      - run:
+          name: Install tar and zip utilities
+          command: |
+            yum -y install tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
