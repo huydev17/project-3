@@ -165,7 +165,6 @@ jobs:
       - image: cimg/base:2021.04
     steps:
       - checkout
-      - dependencies
       # Checkout code from git
       - run:
           name: Ensure back-end infrastructure exists
