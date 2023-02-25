@@ -164,12 +164,9 @@ jobs:
       # Docker image here that supports AWS CLI
       - image: cimg/base:2021.04
     steps:
-      # Checkout code from git
       - checkout
-      - run:
-          name: Install tar and zip utilities
-          command: |
-            yum -y install tar gzip
+      - dependencies
+      # Checkout code from git
       - run:
           name: Ensure back-end infrastructure exists
           command: |
