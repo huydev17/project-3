@@ -424,7 +424,7 @@ workflows:
           filters:
             branches:
               only: [main]
-      - add-prometheus-node-exporter:
+      - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
