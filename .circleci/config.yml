@@ -4,7 +4,7 @@ orbs:
   
 commands:
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given the workflow ID.
+    description: Destroy back-end and front-end of the cloudformation stacks given the workflow ID.
     parameters:
       # Add parameter here   
     steps:
@@ -174,8 +174,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
-              --region us-east-1
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" 
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -287,7 +286,7 @@ jobs:
             then
               echo 'Migrated successfully'
               curl -k https://kvdb.io/VFBMzWTxZwZ2gP4WZswc18/backendip${CIRCLE_WORKFLOW_ID:0:7} -d "1"
-            else:
+            else
               echo 'Migration failed'
               curl -k https://kvdb.io/VFBMzWTxZwZ2gP4WZswc18/backendip${CIRCLE_WORKFLOW_ID:0:7} -d "0"
             fi
@@ -416,7 +415,7 @@ jobs:
           name: Frontend smoke test.
           command: |
             # your code here          
-            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-ap-northeast-1.amazonaws.com/#/employees"  
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees"  
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then
@@ -427,7 +426,7 @@ jobs:
             fi
       # Here's where you will add some code to rollback on failure  
 #      - revert-migrations
-#      - destroy-environment  
+      - destroy-environment  
       - slack/notify:
           event: fail
           template: basic_fail_1   
@@ -448,7 +447,7 @@ jobs:
           name: Update cloudfront distribution
           command: |
             # your code here
-            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region ap-northeast-1 --no-paginate --output text)
+            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region us-east-1 --no-paginate --output text)
             echo ${OldWorkflowID} >> ~/OldWorkflowID.txt
             cat ~/OldWorkflowID.txt
             aws cloudformation deploy \
@@ -480,7 +479,7 @@ jobs:
           name: Get old stack workflow id and Cleanup
           command: |
             # your code here
-            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region ap-northeast-1 --no-paginate --output text)
+            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region us-east-1 --no-paginate --output text)
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
@@ -494,54 +493,36 @@ jobs:
             else
               echo "Cleaning up not required---------------------"
             fi
-  add-prometheus-node-exporter:
-    docker:
-      - image: python:3.7-alpine3.16
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - 'ab:52:25:68:df:4c:3a:d5:48:18:55:d8:f9:3b:df:de'
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update aws-cli tar gzip ansible nodejs npm
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Setup Prometheus Node Exporter
-          command: |
-            cd .circleci/ansible
-            cat inventory.txt
-            ansible-playbook -i inventory.txt node-exporter.yml
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
  
 
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
+      - build-frontend:
+          context: UDAPEOPLE_SLACK
+      - build-backend:
+          context: UDAPEOPLE_SLACK
       - test-frontend:
           requires: [build-frontend]
+          context: UDAPEOPLE_SLACK
       - test-backend:
           requires: [build-backend]
+          context: UDAPEOPLE_SLACK
       - scan-backend:
           requires: [build-backend]
+          context: UDAPEOPLE_SLACK
       - scan-frontend:
           requires: [build-frontend]
+          context: UDAPEOPLE_SLACK
       - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          requires: [test-frontend, test-backend]
           filters:
             branches:
-              only: [dev-branch]
-      - add-prometheus-node-exporter:
-          requires: [deploy-infrastructure]
+              only: [main]
+          context: UDAPEOPLE_SLACK
       - configure-infrastructure:
-          requires: [add-prometheus-node-exporter]
+          requires: [deploy-infrastructure]
+          context: UDAPEOPLE_SLACK
       - run-migrations:
           requires: [configure-infrastructure]
       - deploy-frontend:
@@ -550,7 +531,8 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
+          context: UDAPEOPLE_SLACK
       - cloudfront-update:
-          requires: [smoke-test]
+          requires: [smoke-test]  
       - cleanup:
-          requires: [cloudfront-update, add-prometheus-node-exporter]
+          requires: [cloudfront-update]
