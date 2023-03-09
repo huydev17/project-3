@@ -4,7 +4,7 @@ orbs:
   
 commands:
   destroy-environment:
-    description: Destroy back-end and front-end for the cloudformation stacks given the workflow ID.
+    description: Destroy back-end and front-end of the cloudformation stacks given the workflow ID.
     parameters:
       # Add parameter here   
     steps:
@@ -172,10 +172,9 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
-              --region us-east-1
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+              --tags project=udapeople 
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -287,7 +286,7 @@ jobs:
             then
               echo 'Migrated successfully'
               curl -k https://kvdb.io/VFBMzWTxZwZ2gP4WZswc18/backendip${CIRCLE_WORKFLOW_ID:0:7} -d "1"
-            else:
+            else
               echo 'Migration failed'
               curl -k https://kvdb.io/VFBMzWTxZwZ2gP4WZswc18/backendip${CIRCLE_WORKFLOW_ID:0:7} -d "0"
             fi
@@ -416,7 +415,7 @@ jobs:
           name: Frontend smoke test.
           command: |
             # your code here          
-            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-ap-northeast-1.amazonaws.com/#/employees"  
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees"  
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then
@@ -426,8 +425,8 @@ jobs:
               exit 1
             fi
       # Here's where you will add some code to rollback on failure  
-#      - revert-migrations
-#      - destroy-environment  
+      - revert-migrations
+      - destroy-environment  
       - slack/notify:
           event: fail
           template: basic_fail_1   
@@ -448,7 +447,7 @@ jobs:
           name: Update cloudfront distribution
           command: |
             # your code here
-            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region ap-northeast-1 --no-paginate --output text)
+            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region us-east-1 --no-paginate --output text)
             echo ${OldWorkflowID} >> ~/OldWorkflowID.txt
             cat ~/OldWorkflowID.txt
             aws cloudformation deploy \
@@ -480,7 +479,7 @@ jobs:
           name: Get old stack workflow id and Cleanup
           command: |
             # your code here
-            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region ap-northeast-1 --no-paginate --output text)
+            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --region us-east-1 --no-paginate --output text)
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
