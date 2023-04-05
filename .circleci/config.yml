@@ -139,18 +139,23 @@ jobs:
             npm audit fix --audit-level=critical
   scan-backend:
     docker:
-      - image: cimg/node:13.8.0
+      # Docker image here
+      - image: circleci/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
+      # Restore from cache
       - restore_cache:
-          keys: [backend-deps]
+          key: backend-build
+      # Your job code here
       - run:
-          name: Back-end Scan
+          name: scan backend vulnerability
           command: |
+            # Your code here
             cd backend
             npm install
-            npm audit fix --force --audit-level=critical
-            npm audit fix --force --audit-level=critical
+            npm audit fix --audit-level=critical --force
+            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
   deploy-infrastructure:
     docker:
