@@ -131,8 +131,7 @@ jobs:
           name: Front-end Scan
           command: |
             cd frontend
-            npm install
-            npm audit fix --force --audit-level=critical
+            npm i
             npm audit --audit-level=critical
   scan-backend:
     docker:
