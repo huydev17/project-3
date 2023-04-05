@@ -122,17 +122,21 @@ jobs:
             npm test
   scan-frontend:
     docker:
-      - image: cimg/node:13.8.0
+      - image: circleci/node:13.8.0
     steps:
+      # Checkout code from git
       - checkout
+      # Restore from cache
       - restore_cache:
-          keys: [frontend-deps]
+          key: frontend-build
+      # Your job code here
       - run:
-          name: Front-end Scan
+          name: scan frontend vulnerability
           command: |
+            # Your code here
             cd frontend
             npm i
-            npm audit --audit-level=critical
+            npm audit fix --audit-level=critical
   scan-backend:
     docker:
       - image: cimg/node:13.8.0
