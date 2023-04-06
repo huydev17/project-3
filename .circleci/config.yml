@@ -29,7 +29,7 @@ commands:
             curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
             sudo apt install -y nodejs
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stack given a workflow ID.
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       Workflow_ID:
         type: string
