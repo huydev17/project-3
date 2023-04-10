@@ -1,10 +1,29 @@
-- name: extract artifact
+---
+# - name: 'update the packages.'
+#   become: yes
+#   apt:
+#     upgrade: yes
+#     update_cache: yes
+#     cache_valid_time: 86400
+
+# - name: delete  deps
+#   become: yes
+#   apt:
+#     autoremove: yes
+
+# - name: create pm2
+#   become: yes
+#   npm:
+#     name: pm2
+#     global: yes
+
+- name: extract all artifact resources
   become: yes
   unarchive:
     src: files/artifact.tar.gz
     dest: .
     
-- name: start app
+- name: start the application 
   become: yes
   shell: |
     npm install
@@ -23,11 +42,11 @@
     TYPEORM_PASSWORD: udapeople123AICw3Ab0PaVTFtXFSF8b
     TYPEORM_DATABASE: postgres
     
-- name: "Set pm2 start as service"
+- name: "Configure and then start the pm2"
   become: yes
   shell: |
     env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
-- name: check pm2 status
+- name: verify the status of pm2
   become: yes
   shell: |
     pm2 describe "udapeople-backend"
