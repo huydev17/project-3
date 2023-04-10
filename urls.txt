@@ -1,5 +1,5 @@
 - Public Url to GitHub repository : https://github.com/huydev17/project-3.git
-- Public URL for your S3 Bucket : http://udapeople-c881066.s3-website-us-east-1.amazonaws.com
+- Public URL for your S3 Bucket : http://udapeople-d55094f.s3-website-us-east-1.amazonaws.com
 - Cloudfront Domain Name: https://d2swtrd4sxeini.cloudfront.net/#/employees
 - Api status : https://18.234.162.138:3030/api/status
 - Prometheus Url : http://ec2-18-234-162-138.compute-1.amazonaws.com:9090/targets
