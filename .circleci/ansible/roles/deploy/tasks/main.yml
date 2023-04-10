@@ -1,4 +1,13 @@
 ---
+- name: "Add Node 13"
+  become: true
+  shell: |
+    curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+- name: "Install node 13"
+  become: true
+  apt:
+    name: ["nodejs"]
+    update_cache: yes
 - name: Configure the npm
   become: true
   shell: |
