@@ -1,0 +1,32 @@
+---
+- name: Configure the npm
+  become: true
+  shell: |
+    npm install -g npm@latest
+
+- name: Make some copies compiled files
+  unarchive:
+    src: /root/project/backend.tar.gz
+    dest: /home/ubuntu/
+
+- name: start build backend
+  ignore_errors: yes
+  shell: |
+    cd /home/ubuntu/backend
+    npm i
+    npm run build
+
+- name: running server
+  ignore_errors: yes
+  shell: |
+    pm2 stop backend
+    pm2 delete backend
+
+- name: make server
+  become: true
+  shell: |
+    cd /home/ubuntu/backend
+    pm2 start npm --name backend -- start
+    pm2 ls
+
+  
