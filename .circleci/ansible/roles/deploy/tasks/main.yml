@@ -6,7 +6,7 @@
 
 - name: "Create Unarchived files for the backend"
   unarchive:
-    src: artifact.tar.gz
+    src: ~/project/artifact.tar.gz
     dest: ~/backend-app
 
 - name: "Create the dependency node"
