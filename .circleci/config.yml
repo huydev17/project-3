@@ -271,9 +271,6 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
-      - install_awscli
-      - install_ansible
-      - install_nodejs
       - add_ssh_keys:
           fingerprints: ["bb:2c:4e:7b:4e:8e:8e:79:57:43:82:03:1f:c0:87:ca"]
       - attach_workspace:
