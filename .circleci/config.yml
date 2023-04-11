@@ -268,7 +268,7 @@ jobs:
       - revert-migrations
   deploy-backend:
     docker:
-      - image: cimg/base:stable
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - install_awscli
@@ -277,14 +277,16 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["bb:2c:4e:7b:4e:8e:8e:79:57:43:82:03:1f:c0:87:ca"]
       - attach_workspace:
-          at: ~/
+          at: .
       - restore_cache:
           keys: [backend-deps]
       - run:
           name: Install dependencies
           command: |
-            cd backend
-            npm install
+            apk add --update --no-cache ansible curl rsync openssh nodejs npm tar
+            ansible --version
+            pip install awscli
+            aws --version
       - run:
           name: Package Backend
           command: |
