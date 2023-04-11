@@ -4,8 +4,8 @@
     path: ~/backend-app
     state: directory
 
-- name: "Create Unarchived files for the backend"
-  unarchive:
+- name: "Create unarchived files for the backend"
+  copy:
     src: ~/project/artifact.tar.gz
     dest: ~/backend-app
 
