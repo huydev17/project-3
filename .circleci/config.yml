@@ -149,7 +149,7 @@ jobs:
           key: backend-build
       # Your job code here
       - run:
-          name: scan backend vulnerability
+          name: scan backend vulnerabilities
           command: |
             # Your code here
             cd backend
